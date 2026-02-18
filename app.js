@@ -162,24 +162,32 @@ function initCreateOrder(supplierId) {
         document.body.appendChild(dataList);
     }
 
-    // Suggestions from history (Normalized)
-    const history = State.orders.filter(o => o.supplierId === supplierId).flatMap(o => o.items);
-    const normalizedHistory = history.map(i => i.name.trim().toLowerCase());
-    const uniqueNormalized = [...new Set(normalizedHistory)].map(name => {
-        // Find original or capitalized version
+    // Suggestions from ALL history (Global Catalog)
+    const globalHistory = State.orders.flatMap(o => o.items);
+    const normalizedGlobal = globalHistory.map(i => i.name.trim().toLowerCase());
+    const uniqueGlobal = [...new Set(normalizedGlobal)].map(name => {
         return name.charAt(0).toUpperCase() + name.slice(1);
-    });
+    }).sort();
 
-    dataList.innerHTML = uniqueNormalized.map(name => `<option value="${name}">`).join('');
+    dataList.innerHTML = uniqueGlobal.map(name => `<option value="${name}">`).join('');
 
-    uniqueNormalized.slice(0, 8).forEach(name => {
-        const chip = document.createElement('button');
-        chip.className = 'tab-btn';
-        chip.style = "border:1px solid var(--border); background:white;";
-        chip.innerText = name;
-        chip.onclick = () => addRow(name, '1');
-        suggs.appendChild(chip);
-    });
+    // Quick Selector (Dropdown)
+    suggs.innerHTML = `
+        <div style="width:100%; margin-bottom:10px;">
+            <label style="font-size:0.8rem; color:var(--text-muted); display:block; margin-bottom:4px;">Agregar de mi catálogo:</label>
+            <select id="quick-prod-select" style="width:100%; padding:12px; border-radius:12px; border:1px solid var(--border); background:white; font-family:inherit;">
+                <option value="">-- Elige un producto registrado --</option>
+                ${uniqueGlobal.map(name => `<option value="${name}">${name}</option>`).join('')}
+            </select>
+        </div>
+    `;
+
+    document.getElementById('quick-prod-select').onchange = (e) => {
+        if (e.target.value) {
+            addRow(e.target.value, '1');
+            e.target.value = ''; // Reset select
+        }
+    };
 
     addRow().querySelector('.n-in').focus();
 
