@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BuyLog | Memoria Táctica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="app" class="app-container">
+        <!-- Vistas -->
+    </div>
+
+    <!-- VISTA: HOME (CARWALE STYLE) -->
+    <template id="view-home">
+        <nav class="nav-bar">
+            <div class="nav-logo"><i data-lucide="package"></i> BuyLog</div>
+            <button class="btn-delete" onclick="router.go('settings')"><i data-lucide="settings"></i></button>
+        </nav>
+
+        <header class="hero-banner">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600"
+                alt="Groceries">
+            <div class="hero-text">
+                <h1>Tu Compra Inteligente</h1>
+                <p>Encuentra tu pedido ideal</p>
+            </div>
+        </header>
+
+        <div class="floating-container">
+            <div class="main-search-card">
+                <div class="tab-container">
+                    <button class="tab-btn active" onclick="router.go('suppliers-list')">Nuevo Pedido</button>
+                    <button class="tab-btn" onclick="router.go('history')">Historial</button>
+                    <button class="tab-btn" onclick="router.go('reports')">Reportes</button>
+                </div>
+
+                <div class="search-wrapper" onclick="router.go('suppliers-list')">
+                    <i data-lucide="search" style="color:#64748b; width:18px;"></i>
+                    <input type="text" placeholder="¿A qué proveedor pedimos hoy?" readonly>
+                </div>
+
+                <div class="grid-actions">
+                    <button class="grid-btn" onclick="router.go('suppliers-list')"><i data-lucide="user-plus"></i>
+                        Gestionar</button>
+                    <button class="grid-btn" onclick="exportData()"><i data-lucide="download"></i> Respaldar</button>
+                </div>
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h2 class="section-title">Actividad Reciente</h2>
+            <div id="home-recent"></div>
+        </section>
+    </template>
+
+    <!-- VISTA: LISTA PROVEEDORES -->
+    <template id="view-suppliers-list">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Proveedores</div>
+            <button class="btn-delete" onclick="showSupplierModal()"><i data-lucide="plus-circle"></i></button>
+        </nav>
+        <main class="content-section">
+            <div class="search-wrapper">
+                <i data-lucide="search" style="color:#64748b; width:18px;"></i>
+                <input type="text" id="sup-search-input" placeholder="Buscar proveedor por nombre o rubro...">
+            </div>
+            <div id="suppliers-list-container"></div>
+        </main>
+    </template>
+
+    <!-- VISTA: DETALLE PROVEEDOR -->
+    <template id="view-supplier-detail">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('suppliers-list')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo" id="det-title">Detalle</div>
+            <button id="btn-edit-sup" class="btn-delete"><i data-lucide="edit-3"></i></button>
+        </nav>
+        <main class="content-section">
+            <div class="main-search-card" id="det-info-card"></div>
+            <h2 class="section-title" style="margin-top:24px;">Último Pedido</h2>
+            <div id="det-last-order" style="background:#f8f9fa; padding:16px; border-radius:12px;"></div>
+        </main>
+        <footer class="footer-stick">
+            <button class="btn-primary-full" id="btn-start-order">Nuevo Pedido Ahora ⚡</button>
+        </footer>
+    </template>
+
+    <!-- VISTA: CREAR PEDIDO -->
+    <template id="view-create-order">
+        <nav class="nav-bar">
+            <button class="btn-delete" id="btn-back-create"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Nuevo Pedido</div>
+        </nav>
+        <main class="content-section">
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                <h2 class="section-title">Ítems</h2>
+                <button class="tab-btn" id="btn-repeat-last"
+                    style="background:#eafaf8; color:var(--primary-teal);">Repetir Último</button>
+            </div>
+            <div id="sugg-chips" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
+            <div id="items-list-edit"></div>
+            <button class="grid-btn" id="btn-add-row" style="width:100%; margin-top:12px; border-style:dashed;">+
+                Agregar Ítem</button>
+        </main>
+        <footer class="footer-stick">
+            <button class="btn-primary-full" id="btn-review">DAR EL OK FINAL ✅</button>
+        </footer>
+    </template>
+
+    <!-- VISTA: REVIEW -->
+    <template id="view-review">
+        <nav class="nav-bar">
+            <button class="btn-delete" id="btn-back-review"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Vista Previa</div>
+        </nav>
+        <main class="content-section">
+            <div class="main-search-card" style="margin-bottom:24px;">
+                <div class="form-group"><label>Enviar a:</label><input type="text" id="rev-contact-name"></div>
+                <div class="form-group"><label>Firma:</label><input type="text" id="rev-signature"></div>
+            </div>
+            <div id="preview-msg"
+                style="padding:20px; background:white; border:1px solid var(--border); border-radius:12px; white-space: pre-wrap; font-family: monospace; font-size: 0.9rem;">
+            </div>
+        </main>
+        <footer class="footer-stick" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <button class="btn-primary-full" id="btn-wa" style="background:#25D366;">WhatsApp</button>
+            <button class="btn-primary-full" id="btn-mail">Email</button>
+        </footer>
+    </template>
+
+    <!-- VISTA: REPORTES -->
+    <template id="view-reports">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Reportes</div>
+        </nav>
+        <main class="content-section" id="reports-body"></main>
+    </template>
+
+    <!-- VISTA: HISTORIAL -->
+    <template id="view-history">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Historial</div>
+        </nav>
+        <main id="history-list-full"></main>
+    </template>
+
+    <!-- VISTA: CONFIGURACIÓN -->
+    <template id="view-settings">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Ajustes</div>
+        </nav>
+        <main class="content-section">
+            <div class="main-search-card" style="margin-bottom:20px;">
+                <h3 class="section-title">Datos del Negocio</h3>
+                <div class="form-group"><label>Nombre del Negocio</label><input type="text" id="set-biz"></div>
+                <div class="form-group"><label>Firma por defecto</label><input type="text" id="set-sig"></div>
+                <button class="btn-primary-full" onclick="saveSettings()">Guardar Datos 💾</button>
+            </div>
+
+            <div class="main-search-card" style="margin-bottom:20px;">
+                <h3 class="section-title">Gestión de Usuarios</h3>
+                <div id="users-list" style="margin-bottom:16px;"></div>
+                <div class="form-group">
+                    <label>Nuevo Usuario (Nombre)</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="new-user-name" style="flex:1;">
+                        <select id="new-user-role"
+                            style="padding:8px; border-radius:8px; border:1px solid var(--border);">
+                            <option value="user">Usuario</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-primary" style="width:100%;" onclick="addUser()">+ Agregar Usuario</button>
+            </div>
+
+            <div class="grid-actions">
+                <button class="grid-btn" onclick="exportData()">Exportar JSON</button>
+                <button class="grid-btn" onclick="document.getElementById('import-file').click()">Importar JSON</button>
+                <input type="file" id="import-file" class="hidden" onchange="importData(event)">
+            </div>
+        </main>
+    </template>
+
+    <!-- MODAL -->
+    <div id="modal-container" class="modal-overlay hidden">
+        <div class="modal-content"
+            style="background:white; border-radius:12px; padding:24px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
