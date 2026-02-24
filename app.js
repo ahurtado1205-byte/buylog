@@ -1155,5 +1155,46 @@ window.onload = () => {
 
     State.init();
 };
+/* =========================================================
+   LAYOUT RESPONSIVE GLOBAL (all screens)
+   - evita problemas con 100vh en mobile
+   - evita contenido tapado por el footer fijo
+   ========================================================= */
+
+/* Mejor que 100vh en móviles modernos */
+.app-container{
+  min-height: 100dvh;
+}
+
+/* Cuando existe footer fijo, agregamos "aire" abajo */
+.content-section{
+  padding-bottom: 110px; /* espacio para .footer-stick */
+}
+
+/* En pantallas grandes, que no quede raro el shadow / bordes */
+@media (min-width: 900px){
+  body{
+    background: var(--bg-gray);
+  }
+  .app-container{
+    border-radius: 16px;
+    overflow: hidden;
+  }
+}
+
+/* Footer fijo: sumar safe area para iPhone */
+.footer-stick{
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* Grillas: en mobile a una columna */
+@media (max-width: 640px){
+  .grid-actions{
+    grid-template-columns: 1fr;
+  }
+  .stat-grid{
+    grid-template-columns: 1fr;
+  }
+}
 
 
