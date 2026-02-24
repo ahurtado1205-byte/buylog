@@ -1,18 +1,22 @@
 // --- SUPABASE CONFIG ---
-const SUPABASE_URL = 'https://rekcsmlsombufijcgccu.supabase.co';
+const SUPABASE_URL = 'https://swliklwxtxlbgqsqjcbr.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJla2NzbWxzb21idWJmaWpjZ2N1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTkwMDgsImV4cCI6MjA4NzQzNTAwOH0.d696SiAsqqpNNlgDuKtPB-_0BpsU8j6ntMmKCrlxdpA';
 
 let sb = null;
-try {
-    if (typeof supabase !== 'undefined') {
-        sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log("Supabase Client Init: SUCCESS");
-    } else {
-        console.error("Supabase library not found in index.html");
+const initSupabase = () => {
+    try {
+        if (typeof supabase !== 'undefined') {
+            sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log("✅ Supabase cargado correctamente.");
+            window.sb = sb; // Para poder debuguear desde consola
+        } else {
+            console.error("❌ Error: La librería de Supabase no se cargó.");
+        }
+    } catch (e) {
+        console.error("❌ Error inicializando Supabase:", e);
     }
-} catch (e) {
-    console.error("Supabase Init Error:", e);
-}
+};
+initSupabase();
 
 const State = {
     activeWorkspace: null,
