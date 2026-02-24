@@ -1,6 +1,6 @@
 // --- SUPABASE CONFIG ---
-const SUPABASE_URL = 'https://swliklwxtxlbgqsqjcbr.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJla2NzbWxzb21idWJmaWpjZ2N1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTkwMDgsImV4cCI6MjA4NzQzNTAwOH0.d696SiAsqqpNNlgDuKtPB-_0BpsU8j6ntMmKCrlxdpA';
+const SUPABASE_URL = 'https://rekcsmlsombubfijcgcu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_3UkQfPPUu_G17rD2EenyAg_QQ_vJQsw';
 
 let sb = null;
 const initSupabase = () => {
@@ -1155,3 +1155,4 @@ window.onload = () => {
 
     State.init();
 };
+
