@@ -705,3 +705,22 @@ body.modal-open{
   overflow: hidden;
   touch-action: none;
 }
+/* =========================================================
+   MODAL: scroll interno adaptable (especialmente en mobile)
+   Pegar AL FINAL de styles.css
+   ========================================================= */
+.modal-scroll{
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 5px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile: usar alto real y dejar botones visibles */
+@media (max-width: 640px){
+  .modal-scroll{
+    max-height: none;
+    height: calc(100dvh - 220px);
+    padding-right: 0;
+  }
+}
