@@ -629,6 +629,7 @@ body {
     border-radius: 12px;
     margin-bottom: 16px;
     text-align: center;
+
 }
 /* =========================================================
    RESPONSIVE MODAL (all screens) + safe areas + inner scroll
@@ -696,4 +697,11 @@ body {
     max-height: none;
     overflow: auto;
   }
+}/* =========================================================
+   MODAL: bloquear scroll del fondo cuando está abierto
+   Pegar AL FINAL de styles.css
+   ========================================================= */
+body.modal-open{
+  overflow: hidden;
+  touch-action: none;
 }
