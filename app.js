@@ -478,7 +478,7 @@ window.showOrderDetails = (id) => {
 
     const modal = document.getElementById('modal-container');
     const body = document.getElementById('modal-body');
-    modal.classList.remove('hidden');
+    openModal();
 
     body.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -820,7 +820,7 @@ window.deleteSupplier = async (id) => {
 function showSupplierModal(s = null) {
     const modal = document.getElementById('modal-container');
     const body = document.getElementById('modal-body');
-    modal.classList.remove('hidden');
+    openModal();
     body.innerHTML = `
         <h2 class="section-title">${s ? 'Editar' : 'Nuevo'} Proveedor</h2>
         <div style="max-height: 60vh; overflow-y: auto; padding-right: 5px;">
@@ -1155,4 +1155,5 @@ window.onload = () => {
 
     State.init();
 };
+
 
