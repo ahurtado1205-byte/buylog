@@ -1,9 +1,18 @@
 // --- SUPABASE CONFIG ---
 const SUPABASE_URL = 'https://rekcsmlsombufijcgccu.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJla2NzbWxzb21idWJmaWpjZ2N1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MTg1OTAwOCwiZXhwIjoyMDg3NDM1MDA4fQ.kezRyqccqc51awWYGswMh2hsxKa-DePzzfB87LAU53g';
-const sb = typeof supabase !== 'undefined' ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-console.log("Supabase Client Init:", !!sb);
-if (sb) console.log("Supabase URL:", SUPABASE_URL);
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJla2NzbWxzb21idWJmaWpjZ2N1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE4NTkwMDgsImV4cCI6MjA4NzQzNTAwOH0.d696SiAsqqpNNlgDuKtPB-_0BpsU8j6ntMmKCrlxdpA';
+
+let sb = null;
+try {
+    if (typeof supabase !== 'undefined') {
+        sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        console.log("Supabase Client Init: SUCCESS");
+    } else {
+        console.error("Supabase library not found in index.html");
+    }
+} catch (e) {
+    console.error("Supabase Init Error:", e);
+}
 
 const State = {
     activeWorkspace: null,
