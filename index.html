@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BuyLog | Memoria Táctica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0d9488">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+</head>
+
+<body>
+    <div id="app" class="app-container">
+        <!-- Vistas -->
+    </div>
+
+    <!-- VISTA: HOME (CARWALE STYLE) -->
+    <template id="view-home">
+        <nav class="nav-bar">
+            <div class="nav-logo" style="cursor:pointer" onclick="router.go('home')"><i data-lucide="package"></i>
+                BuyLog</div>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-delete" style="background:#f1f5f9;" onclick="router.go('settings')"><i
+                        data-lucide="settings" style="width:20px;"></i></button>
+            </div>
+        </nav>
+
+        <header class="hero-banner">
+            <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=600"
+                alt="Groceries">
+            <div class="hero-text">
+                <h1>Tu Compra Inteligente</h1>
+                <p>Encuentra tu pedido ideal</p>
+            </div>
+        </header>
+
+        <div class="floating-container">
+            <div class="main-search-card">
+                <div class="tab-container">
+                    <button class="tab-btn active" onclick="router.go('suppliers-list')">Nuevo Pedido</button>
+                    <button class="tab-btn" onclick="router.go('history')">Historial</button>
+                    <button class="tab-btn" onclick="router.go('reports')">Reportes</button>
+                </div>
+
+                <div class="search-wrapper" onclick="router.go('suppliers-list')">
+                    <i data-lucide="search" style="color:#64748b; width:18px;"></i>
+                    <input type="text" placeholder="¿A qué proveedor pedimos hoy?" readonly>
+                </div>
+
+            </div>
+        </div>
+
+        <section class="content-section">
+            <h2 class="section-title">Actividad Reciente</h2>
+            <div id="home-recent"></div>
+        </section>
+    </template>
+
+    <!-- VISTA: LISTA PROVEEDORES -->
+    <template id="view-suppliers-list">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Proveedores</div>
+            <button class="btn-delete" onclick="showSupplierModal()"><i data-lucide="plus-circle"></i></button>
+        </nav>
+        <main class="content-section">
+            <div class="search-wrapper">
+                <i data-lucide="search" style="color:#64748b; width:18px;"></i>
+                <input type="text" id="sup-search-input" placeholder="Buscar proveedor por nombre o rubro...">
+            </div>
+            <div id="suppliers-list-container"></div>
+        </main>
+    </template>
+
+    <!-- VISTA: DETALLE PROVEEDOR -->
+    <template id="view-supplier-detail">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('suppliers-list')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo" id="det-title">Detalle</div>
+            <button id="btn-edit-sup" class="btn-delete"><i data-lucide="edit-3"></i></button>
+        </nav>
+        <main class="content-section">
+            <div class="main-search-card" id="det-info-card"></div>
+            <h2 class="section-title" style="margin-top:24px;">Último Pedido</h2>
+            <div id="det-last-order" style="background:#f8f9fa; padding:16px; border-radius:12px;"></div>
+        </main>
+        <footer class="footer-stick">
+            <button class="btn-primary-full" id="btn-start-order">Nuevo Pedido Ahora ⚡</button>
+        </footer>
+    </template>
+
+    <!-- VISTA: CREAR PEDIDO -->
+    <template id="view-create-order">
+        <nav class="nav-bar">
+            <button class="btn-delete" id="btn-back-create"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Nuevo Pedido</div>
+        </nav>
+        <main class="content-section">
+            <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+                <h2 class="section-title">Ítems</h2>
+                <button class="tab-btn" id="btn-repeat-last"
+                    style="background:#eafaf8; color:var(--primary-teal);">Repetir Último</button>
+            </div>
+            <div id="sugg-chips" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;"></div>
+            <div id="items-list-edit"></div>
+            <button class="grid-btn" id="btn-add-row" style="width:100%; margin-top:12px; border-style:dashed;">+
+                Agregar Ítem</button>
+        </main>
+        <footer class="footer-stick">
+            <button class="btn-primary-full" id="btn-review">DAR EL OK FINAL ✅</button>
+        </footer>
+    </template>
+
+    <!-- VISTA: REVIEW -->
+    <template id="view-review">
+        <nav class="nav-bar">
+            <button class="btn-delete" id="btn-back-review"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Vista Previa</div>
+        </nav>
+        <main class="content-section">
+            <div class="main-search-card" style="margin-bottom:24px;">
+                <div class="form-group"><label>Enviar a:</label><input type="text" id="rev-contact-name"></div>
+                <div class="form-group"><label>Firma:</label><input type="text" id="rev-signature"></div>
+            </div>
+            <div id="preview-msg"
+                style="padding:20px; background:white; border:1px solid var(--border); border-radius:12px; white-space: pre-wrap; font-family: monospace; font-size: 0.9rem;">
+            </div>
+        </main>
+        <footer class="footer-stick" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <button class="btn-primary-full" id="btn-wa"
+                style="background:#25D366; grid-column: span 2;">WhatsApp</button>
+            <button class="btn-primary-full" id="btn-print" style="background:#64748b;">Descargar PDF 📄</button>
+            <button class="btn-primary-full" id="btn-mail">Email</button>
+        </footer>
+    </template>
+
+    <!-- VISTA: REPORTES -->
+    <template id="view-reports">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Reportes</div>
+        </nav>
+        <main class="content-section" id="reports-body"></main>
+    </template>
+
+    <!-- VISTA: HISTORIAL -->
+    <template id="view-history">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Historial</div>
+        </nav>
+        <main id="history-list-full"></main>
+    </template>
+
+    <!-- VISTA: CONFIGURACIÓN -->
+    <template id="view-settings">
+        <nav class="nav-bar">
+            <button class="btn-delete" onclick="router.go('home')"><i data-lucide="arrow-left"></i></button>
+            <div class="nav-logo">Ajustes</div>
+        </nav>
+        <main class="content-section">
+            <div class="main-search-card"
+                style="margin-bottom:20px; border: 2px solid var(--primary-teal); background: #f0fdfa;">
+                <h3 class="section-title" style="color:var(--primary-teal); display:flex; align-items:center; gap:8px;">
+                    <i data-lucide="layout-grid" style="width:20px;"></i> Empresa Activa
+                </h3>
+                <p style="font-size:0.8rem; margin-bottom:12px;">Selecciona o crea un nuevo restaurante para separar la
+                    información.</p>
+                <div id="workspaces-list" style="margin-bottom:16px;"></div>
+                <button class="btn-primary" style="width:100%; background:var(--primary-teal);"
+                    onclick="createWorkspace()">+ Nueva Empresa / Clonar</button>
+            </div>
+
+            <div class="main-search-card" style="margin-bottom:20px;">
+                <h3 class="section-title">Personalización del Hero</h3>
+                <div class="form-group"><label>Título Principal</label><input type="text" id="set-hero-title"></div>
+                <div class="form-group"><label>URL Imagen de Fondo</label><input type="text" id="set-hero-img"></div>
+                <div class="form-group">
+                    <label>O subir foto local</label>
+                    <input type="file" id="hero-upload" accept="image/*" class="hidden"
+                        onchange="handleHeroUpload(event)">
+                    <button class="tab-btn" onclick="document.getElementById('hero-upload').click()"
+                        style="width:100%; border:1px dashed var(--primary-teal);">Subir desde Galería 📸</button>
+                </div>
+                <div class="form-group"><label>Subtítulo (Copete)</label><input type="text" id="set-hero-sub"></div>
+                <button class="btn-primary-full" onclick="saveSettings()">Guardar Cambios 💾</button>
+            </div>
+
+            <div class="main-search-card" style="margin-bottom:20px;">
+                <h3 class="section-title">Datos del Negocio</h3>
+                <div class="form-group"><label>Nombre del Negocio</label><input type="text" id="set-biz"></div>
+                <div class="form-group"><label>Firma por defecto</label><input type="text" id="set-sig"></div>
+                <button class="btn-primary-full" onclick="saveSettings()">Guardar Datos 💾</button>
+            </div>
+
+            <div class="main-search-card" style="margin-bottom:20px;">
+                <h3 class="section-title">Gestión de Usuarios</h3>
+                <div id="users-list" style="margin-bottom:16px;"></div>
+                <div class="form-group">
+                    <label>Nuevo Usuario (Nombre)</label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="new-user-name" style="flex:1;">
+                        <select id="new-user-role"
+                            style="padding:8px; border-radius:8px; border:1px solid var(--border);">
+                            <option value="user">Usuario</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-primary" style="width:100%;" onclick="addUser()">+ Agregar Usuario</button>
+            </div>
+
+            <div class="main-search-card" style="margin-bottom:20px;">
+                <h3 class="section-title">Gestión de Datos (Base de Datos)</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Toda tu información está
+                    guardada de forma segura en tu navegador. Puedes respaldarla o importar datos masivos aquí.</p>
+
+                <div class="grid-actions" style="grid-template-columns: 1fr; gap: 8px;">
+                    <button class="grid-btn" onclick="router.go('suppliers-list')"><i data-lucide="user-plus"
+                            style="width:16px;"></i> Gestionar Proveedores</button>
+                    <button class="grid-btn" onclick="exportData()"><i data-lucide="database" style="width:16px;"></i>
+                        Respaldar Todo (JSON)</button>
+                    <button class="grid-btn" onclick="document.getElementById('import-file').click()"><i
+                            data-lucide="upload-cloud" style="width:16px;"></i> Importar Respaldo (JSON)</button>
+                    <input type="file" id="import-file" class="hidden" onchange="importData(event)">
+                </div>
+
+                <div style="margin-top:16px; border-top:1px solid var(--border); padding-top:16px;">
+                    <h4 style="font-size:0.9rem; margin-bottom:8px;">Importar/Exportar (Excel/CSV)</h4>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                        <button class="tab-btn" onclick="exportSuppliersCSV()">Exportar Prov.</button>
+                        <button class="tab-btn" onclick="document.getElementById('import-csv-file').click()">Importar
+                            Prov.</button>
+                        <button class="tab-btn" onclick="exportOrdersCSV()" style="grid-column: span 2;">Exportar
+                            Historial Pedidos</button>
+                    </div>
+                    <input type="file" id="import-csv-file" class="hidden" accept=".csv"
+                        onchange="importSuppliersCSV(event)">
+                </div>
+                <div style="margin-top:40px; text-align:center; display:flex; flex-direction:column; gap:10px;">
+                    <button class="tab-btn" style="color:#ef4444; border-color:#fee2e2; width:100%;" onclick="logout()">
+                        <i data-lucide="log-out" style="width:16px;"></i> Salir de la Empresa
+                    </button>
+                    <button class="tab-btn"
+                        style="color:#ffffff; background:#ef4444; border:none; width:100%; padding:14px;"
+                        onclick="hardResetApp()">
+                        <i data-lucide="trash-2" style="width:16px;"></i> ELIMINAR TODO Y REINICIAR (CERO)
+                    </button>
+                </div>
+        </main>
+    </template>
+
+    <!-- VISTA: LOGIN (2 PASOS) -->
+    <template id="view-login">
+        <main class="content-section login-screen">
+            <div class="login-container">
+                <div class="login-header">
+                    <div class="logo-badge">
+                        <i data-lucide="package" class="logo-icon"></i>
+                    </div>
+                    <h1>BuyLog</h1>
+                    <p>Tu memoria táctica de compras</p>
+                </div>
+
+                <!-- Paso 1: Empresa -->
+                <div id="login-step-1" class="login-card-v2">
+                    <div class="step-indicator">PASO 1 DE 2</div>
+                    <h2>Identifica tu Negocio</h2>
+                    <p class="step-desc">Ingresa el nombre de tu restaurante o sucursal para acceder a tus datos.</p>
+
+                    <div class="input-group-v2">
+                        <label>NOMBRE DE LA EMPRESA</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="building-2"></i>
+                            <input type="text" id="login-biz-name" placeholder="Ej: Pizzería Roma" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="input-group-v2">
+                        <label>CÓDIGO DE ACCESO</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="lock"></i>
+                            <input type="password" id="login-biz-code" placeholder="Pin secreto" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <button class="btn-primary-v2" onclick="loginPhase1()">
+                        Acceder <i data-lucide="arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Paso 2: Usuario (Oculto inicialmente) -->
+                <div id="login-step-2" class="login-card-v2 hidden">
+                    <div class="step-indicator">PASO 2 DE 2</div>
+                    <h2 id="login-biz-welcome">¡Hola!</h2>
+                    <p class="step-desc">Selecciona quién está operando el sistema hoy:</p>
+
+                    <div id="login-users-grid" class="users-grid">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+
+                    <div class="login-footer-actions">
+                        <button class="btn-ghost"
+                            onclick="document.getElementById('login-step-2').classList.add('hidden'); document.getElementById('login-step-1').classList.remove('hidden');">
+                            <i data-lucide="chevron-left"></i> Cambiar Empresa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </template>
+
+    <!-- MODAL -->
+    <div id="modal-container" class="modal-overlay hidden">
+        <div class="modal-content"
+            style="background:white; border-radius:12px; padding:24px; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:90%; max-width:400px; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
