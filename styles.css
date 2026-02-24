@@ -630,3 +630,70 @@ body {
     margin-bottom: 16px;
     text-align: center;
 }
+/* =========================================================
+   RESPONSIVE MODAL (all screens) + safe areas + inner scroll
+   Pegar AL FINAL de styles.css
+   ========================================================= */
+
+/* Overlay del modal */
+#modal-container.modal-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* Contenedor del modal (desktop/tablet) */
+#modal-container .modal-content{
+  background: #fff;
+  width: min(520px, calc(100vw - 32px));
+  max-height: min(80vh, 720px);
+  overflow: hidden;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+/* El contenido scrollea adentro */
+#modal-container #modal-body{
+  max-height: calc(min(80vh, 720px) - 40px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile: modal pantalla completa */
+@media (max-width: 640px){
+  #modal-container.modal-overlay{
+    padding: 0;
+    align-items: stretch;
+  }
+
+  /* Forzamos full-screen aunque haya estilos inline en el HTML */
+  #modal-container .modal-content{
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    padding: 16px !important;
+    padding-top: calc(16px + env(safe-area-inset-top)) !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+    transform: none !important;
+    top: 0 !important;
+    left: 0 !important;
+    overflow: hidden !important;
+  }
+
+  #modal-container #modal-body{
+    height: 100%;
+    max-height: none;
+    overflow: auto;
+  }
+}
