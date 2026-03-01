@@ -875,7 +875,7 @@ function showSupplierModal(s = null) {
     openModal();
     body.innerHTML = `
         <h2 class="section-title">${s ? 'Editar' : 'Nuevo'} Proveedor</h2>
-        <div style="max-height: 60vh; overflow-y: auto; padding-right: 5px;">
+        <div class="modal-scroll">
             <div class="form-group"><label>Nombre</label><input type="text" id="m-name" value="${s ? s.name : ''}"></div>
             <div class="form-group"><label>Contacto</label><input type="text" id="m-contact" value="${s ? s.contact_name || '' : ''}"></div>
             <div class="form-group"><label>Email</label><input type="email" id="m-email" value="${s ? s.email || '' : ''}"></div>
@@ -1248,6 +1248,7 @@ window.onload = () => {
     grid-template-columns: 1fr;
   }
 }
+
 
 
 
