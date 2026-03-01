@@ -1,4 +1,56 @@
-// --- SUPABASE CONFIG ---
+/* =========================================================
+   MODAL HELPERS (Pegá esto 1 sola vez en app.js)
+   - openModal() / closeModal()
+   - bloquea scroll del fondo (body.modal-open)
+   - cierra tocando el overlay
+   - cierra con ESC
+   ========================================================= */
+
+(function setupModalHelpers() {
+  function getModalEl() {
+    return document.getElementById('modal-container');
+  }
+
+  // Exponer global (porque tu código llama openModal() desde varios lugares)
+  window.openModal = function openModal() {
+    const modal = getModalEl();
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    // Opcional: foco al modal-body para que el scroll sea adentro
+    const body = document.getElementById('modal-body');
+    if (body) body.focus?.();
+  };
+
+  window.closeModal = function closeModal() {
+    const modal = getModalEl();
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  };
+
+  // Click afuera (overlay) cierra
+  document.addEventListener('click', (e) => {
+    const modal = getModalEl();
+    if (!modal || modal.classList.contains('hidden')) return;
+
+    // Si el click fue exactamente en el overlay, cerramos
+    if (e.target === modal) {
+      window.closeModal();
+    }
+  });
+
+  // ESC cierra
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const modal = getModalEl();
+    if (!modal || modal.classList.contains('hidden')) return;
+    window.closeModal();
+  });
+})();// --- SUPABASE CONFIG ---
 const SUPABASE_URL = 'https://rekcsmlsombubfijcgcu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_3UkQfPPUu_G17rD2EenyAg_QQ_vJQsw';
 
@@ -1196,5 +1248,6 @@ window.onload = () => {
     grid-template-columns: 1fr;
   }
 }
+
 
 
